@@ -28,31 +28,60 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestThread {
     public static void thread() {
-        threadStart();
+        UtilsKt.println("调测多线程\n");
+
+        threadNormal();
+        threadCustomClass();
         threadRunnable();
         threadFactory();
         executor();
         callable();
     }
 
-    private static void threadStart() {
+    private static void threadNormal() {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                UtilsKt.println("直接使用 Thread。");
-                UtilsKt.println("Thread run.");
+                UtilsKt.println("run() >> 单独使用 Thread（直接实例化 Thread）。");
+                UtilsKt.println("threadNormal 1");
+                UtilsKt.println("threadNormal 2");
+                UtilsKt.println("threadNormal 3");
+                UtilsKt.println("threadNormal 4");
+                UtilsKt.println("threadNormal 5");
                 UtilsKt.println();
             }
         };
         thread.start();
     }
 
+    private static void threadCustomClass() {
+        CustomThread thread = new CustomThread();
+        thread.start();
+    }
+
+    private static class CustomThread extends Thread {
+        @Override
+        public void run() {
+            UtilsKt.println("run() >> 单独使用 Thread（使用自定义 Thread 类）。");
+            UtilsKt.println("threadCustomClass 1");
+            UtilsKt.println("threadCustomClass 2");
+            UtilsKt.println("threadCustomClass 3");
+            UtilsKt.println("threadCustomClass 4");
+            UtilsKt.println("threadCustomClass 5");
+            UtilsKt.println();
+        }
+    }
+
     private static void threadRunnable() {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println("使用 Runnable，达到重用运行代码的目的。");
-                UtilsKt.println("Thread with Runnable run.");
+                UtilsKt.println("run() >> 使用 Runnable，达到重用运行代码的目的。");
+                UtilsKt.println("threadRunnable 1");
+                UtilsKt.println("threadRunnable 2");
+                UtilsKt.println("threadRunnable 3");
+                UtilsKt.println("threadRunnable 4");
+                UtilsKt.println("threadRunnable 5");
                 UtilsKt.println();
             }
         };
@@ -61,6 +90,19 @@ public class TestThread {
     }
 
     private static void threadFactory() {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                UtilsKt.println(Thread.currentThread().getName() + " >>> run() >> 使用 ThreadFactory。");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 1");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 2");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 3");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 4");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 5");
+                UtilsKt.println();
+            }
+        };
+
         ThreadFactory threadFactory = new ThreadFactory() {
             AtomicInteger count = new AtomicInteger(0);
 
@@ -68,15 +110,6 @@ public class TestThread {
             public Thread newThread(Runnable r) {
                 // 使用工厂方法模式，对新线程的创建进行初始化。
                 return new Thread(r, "Thread-" + count.incrementAndGet());
-            }
-        };
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                UtilsKt.println("使用 ThreadFactory。");
-                UtilsKt.println(Thread.currentThread().getName() + " run.");
-                UtilsKt.println();
             }
         };
 
@@ -96,32 +129,41 @@ public class TestThread {
         //
         Executors.newScheduledThreadPool(10);
 
-        Runnable runnable = new Runnable() {
+        Runnable cachedThreadPoolRunnable = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println("使用 Executor。");
-                UtilsKt.println("Thread with Runnable run.");
+                UtilsKt.println("run() >> 使用 Executor。");
+                UtilsKt.println("executor cachedThreadPoolRunnable 1");
+                UtilsKt.println("executor cachedThreadPoolRunnable 2");
+                UtilsKt.println("executor cachedThreadPoolRunnable 3");
+                UtilsKt.println("executor cachedThreadPoolRunnable 4");
+                UtilsKt.println("executor cachedThreadPoolRunnable 5");
                 UtilsKt.println();
             }
         };
 
         // 常用的线程池。默认0个，上限最大（相当于无限），闲置60秒回收。
         Executor cachedThreadPool = Executors.newCachedThreadPool();
-
-        cachedThreadPool.execute(runnable);
-        cachedThreadPool.execute(runnable);
-        cachedThreadPool.execute(runnable);
+        cachedThreadPool.execute(cachedThreadPoolRunnable);
+        cachedThreadPool.execute(cachedThreadPoolRunnable);
+        cachedThreadPool.execute(cachedThreadPoolRunnable);
 
 
         Runnable runnableProcessImage = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println("处理图片。");
+                UtilsKt.println("run() >> 处理图片。");
+                UtilsKt.println("executor runnableProcessImage 1");
+                UtilsKt.println("executor runnableProcessImage 2");
+                UtilsKt.println("executor runnableProcessImage 3");
+                UtilsKt.println("executor runnableProcessImage 4");
+                UtilsKt.println("executor runnableProcessImage 5");
+                UtilsKt.println();
             }
         };
 
-        List<Bitmap> bitmaps = new ArrayList<>(10);
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
+        List<Bitmap> bitmaps = new ArrayList<>(10);
         for (Bitmap bitmap : bitmaps) {
             fixedThreadPool.execute(runnableProcessImage);
         }
@@ -129,7 +171,7 @@ public class TestThread {
 
 
         ExecutorService mainExecutor = new ThreadPoolExecutor(5, 100, 5, TimeUnit.MINUTES, new SynchronousQueue<>());
-        mainExecutor.execute(runnable);
+        mainExecutor.execute(runnableProcessImage);
     }
 
     private static void callable() {
@@ -138,9 +180,9 @@ public class TestThread {
             @Override
             public String call() throws Exception {
                 try {
-                    UtilsKt.println("使用 Callable，达到重用运行代码的目的。");
+                    UtilsKt.println("call() >> 使用 Callable，达到重用运行代码的目的。");
                     UtilsKt.println("Thread with Callable call.");
-                    Thread.sleep(1500);
+                    Thread.sleep(0);
                     UtilsKt.println();
                 }
                 catch (InterruptedException e) {
@@ -155,7 +197,7 @@ public class TestThread {
         // 循环等待 callable 给 future 返回值。
         while (true) {
             // 在等待 callable 给 future 返回值的期间，做些其他事情。
-            UtilsKt.println("Do something else.");
+            // UtilsKt.println("Do something else.");
 
             // 判断 Callable 是否完成（future 是否拿到返回值）。
             boolean isCallableDone = future.isDone();

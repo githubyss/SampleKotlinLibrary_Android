@@ -92,4 +92,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation dependenciesLib.kotlinx_coroutines_core
+    implementation dependenciesLib.kotlinx_coroutines_android
 }

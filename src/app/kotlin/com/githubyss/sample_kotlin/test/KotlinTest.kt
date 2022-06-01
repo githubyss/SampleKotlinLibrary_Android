@@ -1,6 +1,6 @@
 package com.githubyss.sample_kotlin.test
 
-import com.githubyss.sample_kotlin.test.thread.thread
+import com.githubyss.sample_kotlin.test.coroutine.coroutine
 import com.githubyss.sample_kotlin.test.time_delay.timeDelay
 
 
@@ -12,9 +12,11 @@ fun main(args: Array<String>) {
     // callByFunction()
 
     // TestThread.thread()
-    thread()
+    // thread()
 
     timeDelay()
+
+    coroutine()
 
     // TestSynchronized.synchronize()
 }

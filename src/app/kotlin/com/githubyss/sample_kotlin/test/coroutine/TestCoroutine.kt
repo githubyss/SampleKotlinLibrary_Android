@@ -1,5 +1,7 @@
 package com.githubyss.sample_kotlin.test.coroutine
 
+import kotlinx.coroutines.*
+
 
 /**
  * TestCoroutine
@@ -20,6 +22,33 @@ package com.githubyss.sample_kotlin.test.coroutine
  * @github githubyss
  * @createdTime 2022/04/18 17:17:09
  */
-fun coroutine() {
 
+private var delayInMillis: Long = 3000
+
+fun coroutine() {
+    CoroutineScope(Dispatchers.Main).launch {
+        coroutineDelay()
+        coroutineWithContext()
+    }
+
+}
+
+fun blocking() {
+    runBlocking {
+
+    }
+}
+
+private suspend fun coroutineCoroutineScope() {
+    coroutineScope { }
+}
+
+private suspend fun coroutineDelay() {
+    delay(delayInMillis)
+}
+
+private suspend fun coroutineWithContext() {
+    withContext(Dispatchers.Default) {
+
+    }
 }

@@ -1,6 +1,5 @@
 package com.githubyss.sample_kotlin.test
 
-import com.githubyss.sample_kotlin.test.coroutine.coroutine
 import com.githubyss.sample_kotlin.test.time_delay.timeDelay
 
 
@@ -16,7 +15,7 @@ fun main(args: Array<String>) {
 
     timeDelay()
 
-    coroutine()
+    // coroutine()
 
     // TestSynchronized.synchronize()
 }

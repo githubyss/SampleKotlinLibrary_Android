@@ -28,7 +28,7 @@ fun coroutineAsync() {
 
 
 /**
- * 求和（串行）
+ * 求和（串行）。
  *
  * @param
  * @return
@@ -70,7 +70,7 @@ private fun launchSumSerial() {
 }
 
 /**
- * 求和（并行）
+ * 求和（并行）。
  *
  * @param
  * @return
@@ -112,7 +112,7 @@ private fun launchSumParallel() {
 }
 
 /**
- * 求和（并行惰性启动（延迟启动并发））
+ * 求和（并行惰性启动（延迟启动并发））。
  *
  * @param
  * @return
@@ -160,6 +160,12 @@ private fun launchSumParallelStartLazy() {
     Thread.sleep(threadSleepInMillis)
 }
 
+/**
+ * 求和（并行、惰性启动、结构化并发）。
+ *
+ * @param
+ * @return
+ */
 private fun launchSumParallelStartLazyConcurrent() {
     printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
     println("launch start.")
@@ -169,7 +175,7 @@ private fun launchSumParallelStartLazyConcurrent() {
         val startTime: Long = currentTimeMillis()
         println()
 
-        printlnWithTime("sum = ${concurrentSum()}")
+        printlnWithTime("sum = ${concurrentSumWithContext()}")
         println()
 
         println("Sum end.")
@@ -183,22 +189,44 @@ private fun launchSumParallelStartLazyConcurrent() {
 }
 
 /**
- * 使用 coroutineScope 实现结构化并发。
- * 这种情况下如果一个子协程（并发分支）出现了失败。那么其他的async和等待的父协程都会被取消
+ * 使用 coroutineScope{} 实现结构化并发。
+ * 这种情况下如果一个子协程（并发分支）出现了失败。那么其他的async和等待的父协程都会被取消。
  *
  * @param
  * @return
  */
-private suspend fun concurrentSum(): Double = coroutineScope {
-    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
-    val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
-    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
+private suspend fun concurrentSumCoroutineScope(): Double = coroutineScope {
+    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
     sum1.start()
     sum2.start()
     sum3.start()
     sum1.await() + sum2.await() + sum3.await()
 }
 
+/**
+ * 使用 withContext(CoroutineContext){} 实现结构化并发。
+ *
+ * @param
+ * @return
+ */
+private suspend fun concurrentSumWithContext(): Double = withContext(Dispatchers.Default) {
+    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    sum1.start()
+    sum2.start()
+    sum3.start()
+    sum1.await() + sum2.await() + sum3.await()
+}
+
+/**
+ * 使用 coroutineScope{} 实现求和计算。
+ *
+ * @param
+ * @return
+ */
 private suspend fun sumCoroutineScope(): Double = coroutineScope {
     printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
     var sum: Double = 0.0
@@ -208,6 +236,12 @@ private suspend fun sumCoroutineScope(): Double = coroutineScope {
     sum
 }
 
+/**
+ * 使用 withContext(CoroutineContext){} 实现求和计算。
+ *
+ * @param
+ * @return
+ */
 private suspend fun sumWithContextDefault(): Double = withContext(Dispatchers.Default) {
     printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
     var sum: Double = 0.0
@@ -217,6 +251,12 @@ private suspend fun sumWithContextDefault(): Double = withContext(Dispatchers.De
     sum
 }
 
+/**
+ * 使用 withContext(CoroutineContext){} 实现求和计算。
+ *
+ * @param
+ * @return
+ */
 private suspend fun sumWithContextIO(): Double = withContext(Dispatchers.IO) {
     printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
     var sum: Double = 0.0

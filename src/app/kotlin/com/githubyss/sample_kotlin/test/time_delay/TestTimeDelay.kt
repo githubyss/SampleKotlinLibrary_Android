@@ -1,11 +1,11 @@
 package com.githubyss.sample_kotlin.test.time_delay
 
 import android.os.Handler
-import com.githubyss.mobile.common.kit.util.currentDatetimeYmdHmsMillisFullDividedByEnDash
-import kotlinx.coroutines.CoroutineScope
+import com.githubyss.sample_kotlin.util.printlnWithTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.concurrent.thread
 import kotlin.concurrent.timerTask
@@ -19,10 +19,10 @@ import kotlin.concurrent.timerTask
  * @createdTime 2022/05/20 14:13:23
  */
 
-private var delayInMillis: Long = 3000
+private var delayInMillis: Long = 2000
 
 fun timeDelay() {
-    println("调测延迟")
+    printlnWithTime("调测延迟：CurrentThread: ${Thread.currentThread()}")
     println()
 
     delayCoroutine()
@@ -32,65 +32,72 @@ fun timeDelay() {
 }
 
 private fun delayCoroutine() {
-    CoroutineScope(Dispatchers.Default).launch {
-        println("CoroutineScope().launch {} >> delay start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
-        delay(delayInMillis)
-        println("CoroutineScope().launch {} >> delay finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+    runBlocking {
+        printlnWithTime("withContext(){} >> delay start! \t CurrentThread: ${Thread.currentThread()}")
+        withContext(Dispatchers.Default) {
+            delay(delayInMillis)
+            printlnWithTime("withContext(){} >> delay finish! \t CurrentThread: ${Thread.currentThread()}")
+        }
+
+        println()
     }
 }
 
 private fun delayThread() {
+    printlnWithTime("object:Thread(){} >> sleep start! \t\t\t CurrentThread: ${Thread.currentThread()}")
     object : Thread() {
         override fun run() {
-            println("object : Thread() {} >> sleep start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
-            sleep(delayInMillis)
-            println("object : Thread() {} >> sleep finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+            Thread.sleep(delayInMillis)
+            printlnWithTime("object:Thread(){} >> sleep finish! \t\t\t CurrentThread: ${Thread.currentThread()}")
         }
     }.start()
 
+    printlnWithTime("Thread{run{}} >> sleep start! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
     Thread {
         run {
-            println("Thread { run {}} >> sleep start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
             Thread.sleep(delayInMillis)
-            println("Thread { run {}} >> sleep finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+            printlnWithTime("Thread{run{}} >> sleep finish! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
         }
     }.start()
 
+    printlnWithTime("Thread{} >> sleep start! \t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
     Thread {
-        println("Thread {} >> sleep start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
         Thread.sleep(delayInMillis)
-        println("Thread {} >> sleep finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+        printlnWithTime("Thread{} >> sleep finish! \t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
     }.start()
 
+    printlnWithTime("thread{} >> sleep start! \t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
     thread {
-        println("thread {} >> sleep start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
         Thread.sleep(delayInMillis)
-        println("thread {} >> sleep finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+        printlnWithTime("thread{} >> sleep finish! \t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
     }
 
     println()
 }
 
 private fun delayTimerTask() {
-    println("object : TimerTask() {} >> schedule start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
-    Timer().schedule(object : TimerTask() {
+    val timer: Timer = Timer()
+    printlnWithTime("object:TimerTask(){} >> schedule start! \t CurrentThread: ${Thread.currentThread()}")
+    timer.schedule(object : TimerTask() {
         override fun run() {
-            println("object : TimerTask() {} >> schedule finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+            printlnWithTime("object:TimerTask(){} >> schedule finish! \t CurrentThread: ${Thread.currentThread()}")
+            System.gc()
         }
     }, delayInMillis)
 
-    println("timerTask {} >> schedule start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
-    Timer().schedule(timerTask {
-        println("timerTask {} >> schedule finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+    printlnWithTime("timerTask{} >> schedule start! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
+    timer.schedule(timerTask {
+        printlnWithTime("timerTask{} >> schedule finish! \t\t\t CurrentThread: ${Thread.currentThread()}")
+        System.gc()
     }, delayInMillis)
 
     println()
 }
 
 private fun delayHandler() {
-    println("postDelayed {} >> delay start! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+    printlnWithTime("postDelayed{} >> delay start! \t\t CurrentThread: ${Thread.currentThread()}")
     Handler().postDelayed(Runnable {
-        println("postDelayed {} >> delay finish! CurrentTime: ${currentDatetimeYmdHmsMillisFullDividedByEnDash()}")
+        printlnWithTime("postDelayed{} >> delay finish! \t\t CurrentThread: ${Thread.currentThread()}")
     }, delayInMillis)
 
     println()

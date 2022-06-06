@@ -97,4 +97,5 @@ dependencies {
 
     implementation dependenciesLib.kotlinx_coroutines_core
     implementation dependenciesLib.kotlinx_coroutines_android
+    implementation dependenciesLib.kotlinx_coroutines_test
 }

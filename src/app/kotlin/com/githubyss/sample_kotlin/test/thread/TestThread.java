@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestThread {
     public static void thread() {
-        UtilsKt.println("调测多线程\n");
+        UtilsKt.printlnPost("调测多线程", "");
 
         threadNormal();
         threadCustomClass();
@@ -42,12 +42,12 @@ public class TestThread {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                UtilsKt.println("run() >> 单独使用 Thread（直接实例化 Thread）。");
-                UtilsKt.println("threadNormal 1");
-                UtilsKt.println("threadNormal 2");
-                UtilsKt.println("threadNormal 3");
-                UtilsKt.println("threadNormal 4");
-                UtilsKt.println("threadNormal 5");
+                UtilsKt.println("run() >> 单独使用 Thread（直接实例化 Thread）。", "");
+                UtilsKt.println("threadNormal 1", "");
+                UtilsKt.println("threadNormal 2", "");
+                UtilsKt.println("threadNormal 3", "");
+                UtilsKt.println("threadNormal 4", "");
+                UtilsKt.println("threadNormal 5", "");
                 UtilsKt.println();
             }
         };
@@ -62,12 +62,12 @@ public class TestThread {
     private static class CustomThread extends Thread {
         @Override
         public void run() {
-            UtilsKt.println("run() >> 单独使用 Thread（使用自定义 Thread 类）。");
-            UtilsKt.println("threadCustomClass 1");
-            UtilsKt.println("threadCustomClass 2");
-            UtilsKt.println("threadCustomClass 3");
-            UtilsKt.println("threadCustomClass 4");
-            UtilsKt.println("threadCustomClass 5");
+            UtilsKt.println("run() >> 单独使用 Thread（使用自定义 Thread 类）。", "");
+            UtilsKt.println("threadCustomClass 1", "");
+            UtilsKt.println("threadCustomClass 2", "");
+            UtilsKt.println("threadCustomClass 3", "");
+            UtilsKt.println("threadCustomClass 4", "");
+            UtilsKt.println("threadCustomClass 5", "");
             UtilsKt.println();
         }
     }
@@ -76,12 +76,12 @@ public class TestThread {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println("run() >> 使用 Runnable，达到重用运行代码的目的。");
-                UtilsKt.println("threadRunnable 1");
-                UtilsKt.println("threadRunnable 2");
-                UtilsKt.println("threadRunnable 3");
-                UtilsKt.println("threadRunnable 4");
-                UtilsKt.println("threadRunnable 5");
+                UtilsKt.println("run() >> 使用 Runnable，达到重用运行代码的目的。", "");
+                UtilsKt.println("threadRunnable 1", "");
+                UtilsKt.println("threadRunnable 2", "");
+                UtilsKt.println("threadRunnable 3", "");
+                UtilsKt.println("threadRunnable 4", "");
+                UtilsKt.println("threadRunnable 5", "");
                 UtilsKt.println();
             }
         };
@@ -93,12 +93,12 @@ public class TestThread {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println(Thread.currentThread().getName() + " >>> run() >> 使用 ThreadFactory。");
-                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 1");
-                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 2");
-                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 3");
-                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 4");
-                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 5");
+                UtilsKt.println(Thread.currentThread().getName() + " >>> run() >> 使用 ThreadFactory。", "");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 1", "");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 2", "");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 3", "");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 4", "");
+                UtilsKt.println(Thread.currentThread().getName() + " threadFactory 5", "");
                 UtilsKt.println();
             }
         };
@@ -132,12 +132,12 @@ public class TestThread {
         Runnable cachedThreadPoolRunnable = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println("run() >> 使用 Executor。");
-                UtilsKt.println("executor cachedThreadPoolRunnable 1");
-                UtilsKt.println("executor cachedThreadPoolRunnable 2");
-                UtilsKt.println("executor cachedThreadPoolRunnable 3");
-                UtilsKt.println("executor cachedThreadPoolRunnable 4");
-                UtilsKt.println("executor cachedThreadPoolRunnable 5");
+                UtilsKt.println("run() >> 使用 Executor。", "");
+                UtilsKt.println("executor cachedThreadPoolRunnable 1", "");
+                UtilsKt.println("executor cachedThreadPoolRunnable 2", "");
+                UtilsKt.println("executor cachedThreadPoolRunnable 3", "");
+                UtilsKt.println("executor cachedThreadPoolRunnable 4", "");
+                UtilsKt.println("executor cachedThreadPoolRunnable 5", "");
                 UtilsKt.println();
             }
         };
@@ -152,12 +152,12 @@ public class TestThread {
         Runnable runnableProcessImage = new Runnable() {
             @Override
             public void run() {
-                UtilsKt.println("run() >> 处理图片。");
-                UtilsKt.println("executor runnableProcessImage 1");
-                UtilsKt.println("executor runnableProcessImage 2");
-                UtilsKt.println("executor runnableProcessImage 3");
-                UtilsKt.println("executor runnableProcessImage 4");
-                UtilsKt.println("executor runnableProcessImage 5");
+                UtilsKt.println("run() >> 处理图片。", "");
+                UtilsKt.println("executor runnableProcessImage 1", "");
+                UtilsKt.println("executor runnableProcessImage 2", "");
+                UtilsKt.println("executor runnableProcessImage 3", "");
+                UtilsKt.println("executor runnableProcessImage 4", "");
+                UtilsKt.println("executor runnableProcessImage 5", "");
                 UtilsKt.println();
             }
         };
@@ -180,13 +180,13 @@ public class TestThread {
             @Override
             public String call() throws Exception {
                 try {
-                    UtilsKt.println("call() >> 使用 Callable，达到重用运行代码的目的。");
-                    UtilsKt.println("Thread with Callable call.");
+                    UtilsKt.println("call() >> 使用 Callable，达到重用运行代码的目的。", "");
+                    UtilsKt.println("Thread with Callable call.", "");
                     Thread.sleep(0);
                     UtilsKt.println();
                 }
                 catch (InterruptedException e) {
-                    UtilsKt.println(e.getMessage());
+                    UtilsKt.println(e.getMessage(), "");
                 }
                 return "Done!";
             }
@@ -207,10 +207,10 @@ public class TestThread {
                     // 如果此时 callable 还没有运行结束，则会阻塞，等待返回值。
                     // 所以可以放在 while 死循环中，通过 future.isDone() 获取 callable 的运行完成状态，在等待期间做一些其他事情，直到 callable 运行结束。
                     String result = future.get();
-                    UtilsKt.println("result: " + result);
+                    UtilsKt.println("result: " + result, "");
                 }
                 catch (InterruptedException | ExecutionException e) {
-                    UtilsKt.println(e.getMessage());
+                    UtilsKt.println(e.getMessage(), "");
                 }
                 // 退出循环
                 break;

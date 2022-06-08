@@ -19,8 +19,8 @@ public class TestSynchronized {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                UtilsKt.println("直接使用 Thread。");
-                UtilsKt.println("Thread run.");
+                UtilsKt.println("直接使用 Thread。", "");
+                UtilsKt.println("Thread run.", "");
                 UtilsKt.println();
             }
         };

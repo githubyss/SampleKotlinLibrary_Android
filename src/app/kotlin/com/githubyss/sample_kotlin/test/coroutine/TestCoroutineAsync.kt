@@ -1,13 +1,13 @@
 package com.githubyss.sample_kotlin.test.coroutine
 
 import com.githubyss.mobile.common.kit.util.currentTimeMillis
-import com.githubyss.sample_kotlin.util.printlnWithTime
+import com.githubyss.sample_kotlin.util.*
 import kotlinx.coroutines.*
 
 
 /**
  * TestCoroutineAsync
- * 调测并行协程
+ * 调测协程（并发）
  *
  * @author Ace Yan
  * @github githubyss
@@ -17,13 +17,17 @@ import kotlinx.coroutines.*
 private var threadSleepInMillis: Long = 999999
 
 fun coroutineAsync() {
-    printlnWithTime("调测并行协程：CurrentThread: ${Thread.currentThread()}")
-    println()
+    printlnPostWithTime("调测协程（并发） Start：CurrentThread: ${Thread.currentThread()}")
 
-    // launchSumSerial()
-    // launchSumParallel()
-    // launchSumParallelStartLazy()
-    launchSumParallelStartLazyConcurrent()
+    launchSumSerial()
+    launchSumSerialAsync()
+    // launchSumParallelAsync()
+    // launchSumParallelAsyncStartLazy()
+    // launchSumParallelAsyncStartLazyConcurrent()
+
+    printlnPostWithTime("调测协程（并发） End：CurrentThread: ${Thread.currentThread()}")
+
+    Thread.sleep(threadSleepInMillis)
 }
 
 
@@ -34,111 +38,108 @@ fun coroutineAsync() {
  * @return
  */
 private fun launchSumSerial() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumSerial CoroutineScope().launch{} 外部")
     println("launch start.")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部：CurrentThread: ${Thread.currentThread()}")
-        println("Sum start.")
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumSerial CoroutineScope().launch{} 内部")
+        printlnPrePost("Sum start.")
         val startTime: Long = currentTimeMillis()
-        println()
 
         // 直接使用挂起函数，默认串行执行
         val sum1: Double = sumCoroutineScope()
-        printlnWithTime("sum1 = $sum1")
-        println()
-
         val sum2: Double = sumWithContextDefault()
-        printlnWithTime("sum2 = $sum2")
-        println()
+        val sum3: Double = sumWithContextDefaultByPolling()
+        val sumTotal = sum1 + sum2 + sum3
 
-        val sum3: Double = sumWithContextIO()
-        printlnWithTime("sum3 = $sum3")
-        println()
-
-        val sum = sum1 + sum2 + sum3
-        printlnWithTime("sum = $sum")
-        println()
-
-        println("Sum end.")
         val endTime: Long = currentTimeMillis()
-        println("总耗时：${endTime - startTime} ms")
-        println()
+        printlnWithTime("sumTotal = $sumTotal", "launchSumSerial")
+        println("总耗时：${endTime - startTime} ms", "launchSumSerial")
+
+        printlnPrePost("Sum end.")
     }
     println("launch end.")
-
-    Thread.sleep(threadSleepInMillis)
 }
 
 /**
- * 求和（并行）。
+ * 求和（async 串行）。
  *
  * @param
  * @return
  */
-private fun launchSumParallel() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+private fun launchSumSerialAsync() {
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumSerialAsync CoroutineScope().launch{} 外部")
     println("launch start.")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部：CurrentThread: ${Thread.currentThread()}")
-        println("Sum start.")
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumSerialAsync CoroutineScope().launch{} 内部")
+        printlnPrePost("Sum start.")
         val startTime: Long = currentTimeMillis()
-        println()
+
+        // 通过 async{} 使用挂起函数，通过 Deferred.await() 方法获取挂起函数得到的数据
+        // 这种写法还是串行执行。
+        val sum1: Double = async { sumCoroutineScope() }.await()
+        val sum2: Double = async { sumWithContextDefault() }.await()
+        val sum3: Double = async { sumWithContextDefaultByPolling() }.await()
+        val sumTotal = sum1 + sum2 + sum3
+
+        val endTime: Long = currentTimeMillis()
+        printlnWithTime("sumTotal = $sumTotal", "launchSumSerialAsync")
+        println("总耗时：${endTime - startTime} ms", "launchSumSerialAsync")
+
+        printlnPrePost("Sum end.")
+    }
+    println("launch end.")
+}
+
+/**
+ * 求和（async 并行）。
+ *
+ * @param
+ * @return
+ */
+private fun launchSumParallelAsync() {
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumParallelAsync CoroutineScope().launch{} 外部")
+    println("launch start.")
+    CoroutineScope(Dispatchers.Default).launch {
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumParallelAsync CoroutineScope().launch{} 内部")
+        printlnPrePost("Sum start.")
+        val startTime: Long = currentTimeMillis()
 
         // 通过 async{} 使用挂起函数，实现并行执行
         val sum1: Deferred<Double> = async { sumCoroutineScope() }
-        printlnWithTime("sum1 = $sum1")
-        println()
-
         val sum2: Deferred<Double> = async { sumWithContextDefault() }
-        printlnWithTime("sum2 = $sum2")
-        println()
-
-        val sum3: Deferred<Double> = async { sumWithContextIO() }
-        printlnWithTime("sum3 = $sum3")
-        println()
+        val sum3: Deferred<Double> = async { sumWithContextDefaultByPolling() }
 
         // 通过 Deferred.await() 方法获取挂起函数得到的数据
-        val sum = sum1.await() + sum2.await() + sum3.await()
-        printlnWithTime("sum = $sum")
+        val sumTotal = sum1.await() + sum2.await() + sum3.await()
 
-        println("Sum end.")
         val endTime: Long = currentTimeMillis()
-        println("总耗时：${endTime - startTime} ms")
-        println()
+        printlnWithTime("sumTotal = $sumTotal", "launchSumParallelAsync")
+        println("总耗时：${endTime - startTime} ms", "launchSumParallelAsync")
+
+        printlnPrePost("Sum end.")
     }
     println("launch end.")
-
-    Thread.sleep(threadSleepInMillis)
 }
 
 /**
- * 求和（并行惰性启动（延迟启动并发））。
+ * 求和（async 并行惰性启动（延迟启动并发））。
  *
  * @param
  * @return
  */
-private fun launchSumParallelStartLazy() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+private fun launchSumParallelAsyncStartLazy() {
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumParallelAsyncStartLazy CoroutineScope().launch{} 外部")
     println("launch start.")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部：CurrentThread: ${Thread.currentThread()}")
-        println("Sum start.")
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumParallelAsyncStartLazy CoroutineScope().launch{} 内部")
+        printlnPrePost("Sum start.")
         val startTime: Long = currentTimeMillis()
-        println()
 
         // 通过 start = CoroutineStart.LAZY 设置 async{} 为惰性启动
         // 在这种模式下，只有当我们调用 await 获取协程数据的时候，才会启动 async 的协程计算
         val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
-        printlnWithTime("sum1 = $sum1")
-        println()
-
         val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
-        printlnWithTime("sum2 = $sum2")
-        println()
-
-        val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextIO() }
-        printlnWithTime("sum3 = $sum3")
-        println()
+        val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefaultByPolling() }
 
         // 如果还想主动去启动并发的话，那么就需要通过调用 start 函数来启动。
         // 启动并行协程，否则并行不会生效。哪个没有 start，哪个就默认串行执行。
@@ -146,46 +147,41 @@ private fun launchSumParallelStartLazy() {
         sum2.start()
         sum3.start()
 
-        val sum = sum1.await() + sum2.await() + sum3.await()
-        printlnWithTime("sum = $sum")
-        println()
+        val sumTotal = sum1.await() + sum2.await() + sum3.await()
 
-        println("Sum end.")
         val endTime: Long = currentTimeMillis()
-        println("总耗时：${endTime - startTime} ms")
-        println()
+        printlnWithTime("sumTotal = $sumTotal", "launchSumParallelAsyncStartLazy")
+        println("总耗时：${endTime - startTime} ms", "launchSumParallelAsyncStartLazy")
+
+        printlnPrePost("Sum end.")
     }
     println("launch end.")
-
-    Thread.sleep(threadSleepInMillis)
 }
 
 /**
- * 求和（并行、惰性启动、结构化并发）。
+ * 求和（async 并行、惰性启动、结构化并发）。
  *
  * @param
  * @return
  */
-private fun launchSumParallelStartLazyConcurrent() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+private fun launchSumParallelAsyncStartLazyConcurrent() {
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumParallelAsyncStartLazyConcurrent CoroutineScope().launch{} 外部")
     println("launch start.")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部：CurrentThread: ${Thread.currentThread()}")
-        println("Sum start.")
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchSumParallelAsyncStartLazyConcurrent CoroutineScope().launch{} 内部")
+        printlnPrePost("Sum start.")
         val startTime: Long = currentTimeMillis()
-        println()
 
-        printlnWithTime("sum = ${concurrentSumWithContext()}")
-        println()
+        // val sumTotal = concurrentSumCoroutineScope()
+        val sumTotal = concurrentSumWithContext()
 
-        println("Sum end.")
         val endTime: Long = currentTimeMillis()
-        println("总耗时：${endTime - startTime} ms")
-        println()
+        printlnWithTime("sumTotal = $sumTotal", "launchSumParallelAsyncStartLazyConcurrent")
+        println("总耗时：${endTime - startTime} ms", "launchSumParallelAsyncStartLazyConcurrent")
+
+        printlnPrePost("Sum end.")
     }
     println("launch end.")
-
-    Thread.sleep(threadSleepInMillis)
 }
 
 /**
@@ -196,9 +192,9 @@ private fun launchSumParallelStartLazyConcurrent() {
  * @return
  */
 private suspend fun concurrentSumCoroutineScope(): Double = coroutineScope {
-    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
     val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
-    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefaultByPolling() }
     sum1.start()
     sum2.start()
     sum3.start()
@@ -212,9 +208,9 @@ private suspend fun concurrentSumCoroutineScope(): Double = coroutineScope {
  * @return
  */
 private suspend fun concurrentSumWithContext(): Double = withContext(Dispatchers.Default) {
-    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
     val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
-    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefaultByPolling() }
     sum1.start()
     sum2.start()
     sum3.start()
@@ -228,11 +224,17 @@ private suspend fun concurrentSumWithContext(): Double = withContext(Dispatchers
  * @return
  */
 private suspend fun sumCoroutineScope(): Double = coroutineScope {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}", "coroutineScope")
+    val startTime: Long = currentTimeMillis()
+
     var sum: Double = 0.0
-    for (i in 0 until 2000000000) {
+    for (i in 1 until 2000000001) {
         sum += i
     }
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("sum = $sum", "coroutineScope")
+    printlnPost("耗时：${endTime - startTime} ms", "coroutineScope")
     sum
 }
 
@@ -243,11 +245,74 @@ private suspend fun sumCoroutineScope(): Double = coroutineScope {
  * @return
  */
 private suspend fun sumWithContextDefault(): Double = withContext(Dispatchers.Default) {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}", "withContextDefault")
+    val startTime: Long = currentTimeMillis()
+
     var sum: Double = 0.0
-    for (i in 0 until 2000000000) {
+    for (i in 1 until 2000000001) {
         sum += i
     }
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("sum = $sum", "withContextDefault")
+    printlnPost("耗时：${endTime - startTime} ms", "withContextDefault")
+    sum
+}
+
+/**
+ * 使用 withContext(CoroutineContext){} 实现求和计算（通过自定义标志位控制轮询）。
+ * 通过自定义标志位控制循环，达到条件就退出循环。
+ *
+ * @param
+ * @return
+ */
+private suspend fun sumWithContextDefaultByPolling(): Double = withContext(Dispatchers.Default) {
+    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}", "withContextDefaultByPolling")
+    val startTime: Long = currentTimeMillis()
+
+    var isActive: Boolean = true
+    var i: Long = 1
+    var sum: Double = 0.0
+    while (isActive) {
+        if (i == 2000000000L) {
+            isActive = false
+        }
+        sum += i
+        i++
+    }
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("sum = $sum", "withContextDefaultByPolling")
+    printlnPost("耗时：${endTime - startTime} ms", "withContextDefaultByPolling")
+    sum
+}
+
+/**
+ * 使用 withContext(CoroutineContext){} 实现求和计算（通过 CoroutineScope.isActive 标志位控制轮询）。
+ * 通过 CoroutineScope.isActive 标志位控制循环，达到条件就 CoroutineScope.cancel() 退出循环。
+ * 实际上这样做会取消这个挂起函数所在的协程作用域，导致作用域中该挂起函数后面的代码无法执行。
+ *
+ * @param
+ * @return
+ */
+private suspend fun sumWithContextDefaultByPollingByCancel(): Double = withContext(Dispatchers.Default) {
+    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}", "withContextDefaultByPollingByCancel")
+    val startTime: Long = currentTimeMillis()
+
+    var i: Long = 1
+    var sum: Double = 0.0
+    while (isActive) {
+        if (i == 2000000000L) {
+            //
+            this.cancel()
+        }
+        sum += i
+        i++
+    }
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("sum = $sum", "withContextDefaultByPollingByCancel")
+    printlnPost("耗时：${endTime - startTime} ms", "withContextDefaultByPollingByCancel")
     sum
 }
 
@@ -258,10 +323,16 @@ private suspend fun sumWithContextDefault(): Double = withContext(Dispatchers.De
  * @return
  */
 private suspend fun sumWithContextIO(): Double = withContext(Dispatchers.IO) {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}", "withContextIO")
+    val startTime: Long = currentTimeMillis()
+
     var sum: Double = 0.0
-    for (i in 0 until 2000000000) {
+    for (i in 1 until 2000000001) {
         sum += i
     }
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("sum = $sum", "withContextIO")
+    printlnPost("耗时：${endTime - startTime} ms", "withContextIO")
     sum
 }

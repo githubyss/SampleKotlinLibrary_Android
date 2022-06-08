@@ -1,8 +1,11 @@
 package com.githubyss.sample_kotlin.test.coroutine
 
 import com.githubyss.mobile.common.kit.util.currentTimeMillis
-import com.githubyss.sample_kotlin.util.printlnWithTime
+import com.githubyss.sample_kotlin.util.*
 import kotlinx.coroutines.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlin.io.println
 
 
 /**
@@ -17,96 +20,134 @@ import kotlinx.coroutines.*
 private var threadSleepInMillis: Long = 999999
 
 fun coroutineCallback() {
-    printlnWithTime("调测协程回调：CurrentThread: ${Thread.currentThread()}")
-    println()
+    printlnPostWithTime("调测协程回调 Start：CurrentThread: ${Thread.currentThread()}")
 
-    launchCheck()
+    // launchCheck()
+    launchCheckParallelAsyncStartLazyConcurrent()
+
+    printlnPostWithTime("调测协程回调 End：CurrentThread: ${Thread.currentThread()}")
+
+    Thread.sleep(threadSleepInMillis)
 }
 
 
 /**
- * 检索。
+ * 检索（串行）。
  *
  * @param
  * @return
  */
 private fun launchCheck() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchCheck CoroutineScope().launch{} 外部")
     println("launch start.")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部：CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchCheck CoroutineScope().launch{} 内部")
         println("Check start.")
         val startTime: Long = currentTimeMillis()
-        println()
 
         // 直接使用挂起函数，默认串行执行
-        val result1: Double = checkCoroutineScope()
-        printlnWithTime("result1 = $result1")
-        println()
+        val result1: Boolean = checkSuspendCoroutine()
+        val result2: Boolean = checkSuspendCoroutineByPolling()
+        val result3: Boolean = checkSuspendCoroutineByPolling()
+        val resultFinal = result1 && result2 && result3
 
-        val result2: Double = checkWithContextDefault()
-        printlnWithTime("result2 = $result2")
-        println()
-
-        val result3: Double = checkWithContextIO()
-        printlnWithTime("result3 = $result3")
-        println()
-
-        val result = result1 + result2 + result3
-        printlnWithTime("result = $result")
-        println()
-
-        println("Check end.")
         val endTime: Long = currentTimeMillis()
-        println("总耗时：${endTime - startTime} ms")
-        println()
+        printlnWithTime("resultFinal = $resultFinal", "launchCheck")
+        println("总耗时：${endTime - startTime} ms", "launchCheck")
+
+        printlnPrePost("Check end.")
+    }
+    println("launch end.")
+}
+
+/**
+ * 检索（async 并行）。
+ *
+ * @param
+ * @return
+ */
+private fun launchCheckParallelAsyncStartLazyConcurrent() {
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchCheckParallelAsyncStartLazyConcurrent CoroutineScope().launch{} 外部")
+    println("launch start.")
+    CoroutineScope(Dispatchers.Default).launch {
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchCheckParallelAsyncStartLazyConcurrent CoroutineScope().launch{} 内部")
+        printlnPrePost("Check start.")
+        val startTime: Long = currentTimeMillis()
+
+        val resultFinal = concurrentCheckWithContext()
+
+        val endTime: Long = currentTimeMillis()
+        printlnWithTime("resultFinal = $resultFinal", "launchCheckParallelAsyncStartLazyConcurrent")
+        println("总耗时：${endTime - startTime} ms", "launchCheckParallelAsyncStartLazyConcurrent")
+
+        printlnPrePost("Check end.")
     }
     println("launch end.")
 
     Thread.sleep(threadSleepInMillis)
 }
 
-/**
- * 使用 coroutineScope{} 实现求和计算。
- *
- * @param
- * @return
- */
-private suspend fun checkCoroutineScope(): Double = coroutineScope {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
-    var sum: Double = 0.0
-    for (i in 0 until 2000000000) {
-        sum += i
-    }
-    sum
+private suspend fun concurrentCheckWithContext(): Boolean = withContext(Dispatchers.Default) {
+    val result1: Deferred<Boolean> = async(start = CoroutineStart.LAZY) { checkSuspendCoroutine() }
+    val result2: Deferred<Boolean> = async(start = CoroutineStart.LAZY) { checkSuspendCoroutineByPolling() }
+    val result3: Deferred<Boolean> = async(start = CoroutineStart.LAZY) { checkSuspendCoroutineByPolling() }
+
+    // 协程作用域中执行 cancel()，会使整个协程作用域的协程取消。
+    // this.cancel()
+
+    result1.start()
+    result2.start()
+    result3.start()
+
+    result1.await() && result2.await() && result3.await()
 }
 
 /**
- * 使用 withContext(CoroutineContext){} 实现求和计算。
+ * 使用 suspendCoroutine{} 实现数据检索。
  *
  * @param
  * @return
  */
-private suspend fun checkWithContextDefault(): Double = withContext(Dispatchers.Default) {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
-    var sum: Double = 0.0
-    for (i in 0 until 2000000000) {
-        sum += i
+private suspend fun checkSuspendCoroutine(): Boolean = suspendCoroutine {
+    printlnWithTime("CurrentThread check: ${Thread.currentThread()}", "suspendCoroutine")
+    val startTime: Long = currentTimeMillis()
+
+    var result: Boolean = false
+    for (i in 0 until 2000000001) {
+        if (i == 2000000000) {
+            result = true
+            it.resume(result)
+        }
     }
-    sum
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("result = $result", "suspendCoroutine")
+    printlnPost("耗时：${endTime - startTime} ms", "suspendCoroutine")
 }
 
 /**
- * 使用 withContext(CoroutineContext){} 实现求和计算。
+ * 使用 suspendCoroutine{} 实现数据检索（通过自定义标志位控制轮询）。
  *
  * @param
  * @return
  */
-private suspend fun checkWithContextIO(): Double = withContext(Dispatchers.IO) {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}")
-    var sum: Double = 0.0
-    for (i in 0 until 2000000000) {
-        sum += i
+private suspend fun checkSuspendCoroutineByPolling(): Boolean = suspendCoroutine {
+    printlnWithTime("CurrentThread check: ${Thread.currentThread()}", "suspendCoroutineByPolling")
+    val startTime: Long = currentTimeMillis()
+
+    var isActive: Boolean = true
+    var i: Long = 0
+    var result: Boolean = false
+    while (isActive) {
+        if (i == 2000000000L) {
+            result = true
+            it.resume(result)
+            isActive = false
+        }
+        i++
     }
-    sum
+
+    val endTime: Long = currentTimeMillis()
+    printlnWithTime("result = $result", "suspendCoroutineByPolling")
+    printlnPost("耗时：${endTime - startTime} ms", "suspendCoroutineByPolling")
 }

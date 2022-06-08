@@ -3,18 +3,58 @@ package com.githubyss.sample_kotlin.util
 import com.githubyss.mobile.common.kit.util.currentDatetimeYmdH24msMillisFullDividedByEnDash
 
 
-fun print(string: String) {
-    kotlin.io.print(string)
+fun print(msg: String) {
+    kotlin.io.print(msg)
 }
 
 fun println() {
     kotlin.io.println()
 }
 
-fun println(string: String) {
-    kotlin.io.println(string)
+fun println(msg: String, suffix: String = "") {
+    val suffix: String = when {
+        suffix.isEmpty() -> ""
+        else -> " >> $suffix"
+    }
+    kotlin.io.println("$msg$suffix")
 }
 
-fun printlnWithTime(string: String) {
-    kotlin.io.println("$string | CurrentTime: ${currentDatetimeYmdH24msMillisFullDividedByEnDash()}")
+fun printlnPre(msg: String, suffix: String = "") {
+    println()
+    println(msg, suffix)
+}
+
+fun printlnPost(msg: String, suffix: String = "") {
+    println(msg, suffix)
+    println()
+}
+
+fun printlnPrePost(msg: String, suffix: String = "") {
+    println()
+    println(msg, suffix)
+    println()
+}
+
+fun printlnWithTime(msg: String, suffix: String = "") {
+    val suffix: String = when {
+        suffix.isEmpty() -> ""
+        else -> " >> $suffix"
+    }
+    kotlin.io.println("$msg | CurrentTime: ${currentDatetimeYmdH24msMillisFullDividedByEnDash()}$suffix")
+}
+
+fun printlnPreWithTime(msg: String, suffix: String = "") {
+    println()
+    printlnWithTime(msg, suffix)
+}
+
+fun printlnPostWithTime(msg: String, suffix: String = "") {
+    printlnWithTime(msg, suffix)
+    println()
+}
+
+fun printlnPrePostWithTime(msg: String, suffix: String = "") {
+    println()
+    printlnWithTime(msg, suffix)
+    println()
 }

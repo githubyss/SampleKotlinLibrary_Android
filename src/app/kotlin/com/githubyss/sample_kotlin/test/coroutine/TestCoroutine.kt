@@ -1,11 +1,14 @@
 package com.githubyss.sample_kotlin.test.coroutine
 
+import com.githubyss.sample_kotlin.util.printlnPost
+import com.githubyss.sample_kotlin.util.printlnPostWithTime
 import com.githubyss.sample_kotlin.util.printlnWithTime
 import kotlinx.coroutines.*
 
 
 /**
  * TestCoroutine
+ * 调测协程
  *
  * - Dispatchers.Default：
  * *默认的调度器，适合处理后台计算，是一个CPU密集型任务调度器。如果创建 Coroutine 的时候没有指定 dispatcher，则一般默认使用这个作为默认值。Default dispatcher 使用一个共享的后台线程池来运行里面的任务。注意它和IO共享线程池，只不过限制了最大并发数不同。*
@@ -24,33 +27,30 @@ import kotlinx.coroutines.*
  * @createdTime 2022/04/18 17:17:09
  */
 
-private var delayInMillis: Long = 5000
+private var delayInMillis: Long = 3000
 private var threadSleepInMillis: Long = 999999
 
 fun coroutine() {
-    printlnWithTime("调测协程：CurrentThread: ${Thread.currentThread()}")
-    println()
+    printlnPostWithTime("调测协程 Start：CurrentThread: ${Thread.currentThread()}")
 
-    launchAllInOne()
-    // launchInMulti()
+    // launchAllInOne()
+    launchInMulti()
     // runBlocking()
+
+    printlnPostWithTime("调测协程 End：CurrentThread: ${Thread.currentThread()}")
 }
 
 private fun launchAllInOne() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchAllInOne CoroutineScope().launch{} 外部")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部：CurrentThread: ${Thread.currentThread()}")
+        printlnPostWithTime("CurrentThread: ${Thread.currentThread()}", "launchAllInOne CoroutineScope().launch{} 内部")
 
         coroutineLaunch()
         coroutineLaunch()
-        coroutineLaunch()
-        coroutineCoroutineScope()
         coroutineCoroutineScope()
         coroutineCoroutineScope()
         coroutineWithContext()
         coroutineWithContext()
-        coroutineWithContext()
-        coroutineDelay()
         coroutineDelay()
         coroutineDelay()
     }
@@ -59,35 +59,31 @@ private fun launchAllInOne() {
 }
 
 private fun launchInMulti() {
-    printlnWithTime("CoroutineScope().launch{} 外部：CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchInMulti CoroutineScope().launch{} 外部")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部 for launch：CurrentThread: ${Thread.currentThread()}")
+        printlnPostWithTime("CurrentThread: ${Thread.currentThread()}", "launchInMulti CoroutineScope().launch{} 内部 for launch")
 
-        coroutineLaunch()
         coroutineLaunch()
         coroutineLaunch()
     }
 
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部 for coroutineScope：CurrentThread: ${Thread.currentThread()}")
+        printlnPostWithTime("CurrentThread: ${Thread.currentThread()}", "launchInMulti CoroutineScope().launch{} 内部 for coroutineScope")
 
-        coroutineCoroutineScope()
         coroutineCoroutineScope()
         coroutineCoroutineScope()
     }
 
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部 for withContext：CurrentThread: ${Thread.currentThread()}")
+        printlnPostWithTime("CurrentThread: ${Thread.currentThread()}", "launchInMulti CoroutineScope().launch{} 内部 for withContext")
 
-        coroutineWithContext()
         coroutineWithContext()
         coroutineWithContext()
     }
 
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("CoroutineScope().launch{} 内部 for delay：CurrentThread: ${Thread.currentThread()}")
+        printlnPostWithTime("CurrentThread: ${Thread.currentThread()}", "launchInMulti CoroutineScope().launch{} 内部 for delay")
 
-        coroutineDelay()
         coroutineDelay()
         coroutineDelay()
     }
@@ -96,9 +92,9 @@ private fun launchInMulti() {
 }
 
 private fun runBlocking() {
-    printlnWithTime("runBlocking(){} 外部：CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "runBlocking runBlocking(){} 外部")
     runBlocking {
-        printlnWithTime("runBlocking(){} 内部：CurrentThread: ${Thread.currentThread()}")
+        printlnPostWithTime("CurrentThread: ${Thread.currentThread()}", "runBlocking runBlocking(){} 内部")
 
         coroutineLaunch()
         coroutineLaunch()
@@ -119,15 +115,14 @@ private fun runBlocking() {
  * @return
  */
 private suspend fun coroutineLaunch() {
-    println()
-    printlnWithTime("CoroutineScope(Dispatchers.Default).launch{} 实现的挂起，可以多个并行。CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "CoroutineScope(Dispatchers.Default).launch{} 实现的挂起，可以多个并行。")
     println("suspend launch start.")
     CoroutineScope(Dispatchers.Default).launch {
-        printlnWithTime("launch{} >> start! \t\t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("start!  CurrentThread: ${Thread.currentThread()}", "launch{}")
         delay(delayInMillis)
-        printlnWithTime("launch{} >> finish! \t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("finish! CurrentThread: ${Thread.currentThread()}", "launch{}")
     }
-    println("suspend launch end.")
+    printlnPost("suspend launch end.")
 }
 
 /**
@@ -137,15 +132,14 @@ private suspend fun coroutineLaunch() {
  * @return
  */
 private suspend fun coroutineCoroutineScope() {
-    println()
-    printlnWithTime("coroutineScope{} 实现的挂起，只能一个一个运行。CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "coroutineScope{} 实现的挂起，只能一个一个运行。")
     println("suspend coroutineScope start.")
     coroutineScope {
-        printlnWithTime("coroutineScope{} >> start! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("start!  CurrentThread: ${Thread.currentThread()}", "coroutineScope{}")
         delay(delayInMillis)
-        printlnWithTime("coroutineScope{} >> finish! \t\t\t CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("finish! CurrentThread: ${Thread.currentThread()}", "coroutineScope{}")
     }
-    println("suspend coroutineScope end.")
+    printlnPost("suspend coroutineScope end.")
 }
 
 /**
@@ -155,15 +149,14 @@ private suspend fun coroutineCoroutineScope() {
  * @return
  */
 private suspend fun coroutineWithContext() {
-    println()
-    printlnWithTime("withContext(){} 实现的挂起，只能一个一个运行。CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "withContext(){} 实现的挂起，只能一个一个运行。")
     println("suspend withContext start.")
     withContext(Dispatchers.IO) {
-        printlnWithTime("withContext(){} >> start! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("start!  CurrentThread: ${Thread.currentThread()}", "withContext(){}")
         delay(delayInMillis)
-        printlnWithTime("withContext(){} >> finish! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
+        printlnWithTime("finish! CurrentThread: ${Thread.currentThread()}", "withContext(){}")
     }
-    println("suspend withContext end.")
+    printlnPost("suspend withContext end.")
 }
 
 /**
@@ -173,11 +166,10 @@ private suspend fun coroutineWithContext() {
  * @return
  */
 private suspend fun coroutineDelay() {
-    println()
-    printlnWithTime("delay() 实现的挂起，只能一个一个运行。CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "delay() 实现的挂起，只能一个一个运行。")
     println("suspend delay start.")
-    printlnWithTime("delay() >> start! \t\t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
+    printlnWithTime("start!  CurrentThread: ${Thread.currentThread()}", "delay()")
     delay(delayInMillis)
-    printlnWithTime("delay() >> finish! \t\t\t\t\t\t CurrentThread: ${Thread.currentThread()}")
-    println("suspend delay end.")
+    printlnWithTime("finish! CurrentThread: ${Thread.currentThread()}", "delay()")
+    printlnPost("suspend delay end.")
 }

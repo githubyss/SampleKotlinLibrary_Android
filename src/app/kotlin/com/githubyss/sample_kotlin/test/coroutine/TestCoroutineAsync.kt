@@ -303,7 +303,7 @@ private suspend fun sumWithContextDefaultByPollingByCancel(): Double = withConte
     var sum: Double = 0.0
     while (isActive) {
         if (i == 2000000000L) {
-            //
+            // 协程作用域中执行 cancel()，会使整个协程作用域的协程取消。
             this.cancel()
         }
         sum += i

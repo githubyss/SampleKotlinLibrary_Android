@@ -208,13 +208,18 @@ private suspend fun concurrentSumCoroutineScope(): Double = coroutineScope {
  * @return
  */
 private suspend fun concurrentSumWithContext(): Double = withContext(Dispatchers.Default) {
-    val sum1: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
-    val sum2: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
-    val sum3: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefaultByPolling() }
-    sum1.start()
-    sum2.start()
-    sum3.start()
-    sum1.await() + sum2.await() + sum3.await()
+    val sum1Deferred: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumCoroutineScope() }
+    val sum2Deferred: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefault() }
+    val sum3Deferred: Deferred<Double> = async(start = CoroutineStart.LAZY) { sumWithContextDefaultByPolling() }
+    sum1Deferred.start()
+    sum2Deferred.start()
+    sum3Deferred.start()
+
+    val sum1 = sum1Deferred.await()
+    val sum2 = sum2Deferred.await()
+    val sum3 = sum3Deferred.await()
+
+    sum1 + sum2 + sum3
 }
 
 /**

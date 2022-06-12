@@ -131,7 +131,7 @@ private suspend fun checkSuspendCoroutine(): Boolean = suspendCoroutine {
  * @param
  * @return
  */
-private suspend fun checkSuspendCoroutineByPolling(): Boolean = suspendCoroutine {
+private suspend fun checkSuspendCoroutineByPolling(): Boolean = suspendCoroutine { continuation ->
     printlnWithTime("CurrentThread check: ${Thread.currentThread()}", "suspendCoroutineByPolling")
     val startTime: Long = currentTimeMillis()
 
@@ -141,7 +141,7 @@ private suspend fun checkSuspendCoroutineByPolling(): Boolean = suspendCoroutine
     while (isActive) {
         if (i == 2000000000L) {
             result = true
-            it.resume(result)
+            continuation.resume(result)
             isActive = false
         }
         i++

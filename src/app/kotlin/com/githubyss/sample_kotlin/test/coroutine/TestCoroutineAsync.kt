@@ -19,11 +19,12 @@ private var threadSleepInMillis: Long = 999999
 fun coroutineAsync() {
     printlnPostWithTime("调测协程（并发） Start：CurrentThread: ${Thread.currentThread()}")
 
-    launchSumSerial()
-    launchSumSerialAsync()
+    // launchSumSerial()
+    // launchSumSerialAsync()
     // launchSumParallelAsync()
     // launchSumParallelAsyncStartLazy()
     // launchSumParallelAsyncStartLazyConcurrent()
+    launchTimeConsumingParallelAsyncStartLazy()
 
     printlnPostWithTime("调测协程（并发） End：CurrentThread: ${Thread.currentThread()}")
 
@@ -31,8 +32,12 @@ fun coroutineAsync() {
 }
 
 
+/** ******************** 串行、并行 ******************** */
+
+/** ********** 求和 ********** */
+
 /**
- * 求和（串行）。
+ * 启动求和（串行）。
  *
  * @param
  * @return
@@ -61,7 +66,7 @@ private fun launchSumSerial() {
 }
 
 /**
- * 求和（async 串行）。
+ * 启动求和（async 串行）。
  *
  * @param
  * @return
@@ -91,7 +96,7 @@ private fun launchSumSerialAsync() {
 }
 
 /**
- * 求和（async 并行）。
+ * 启动求和（async 并行）。
  *
  * @param
  * @return
@@ -122,7 +127,7 @@ private fun launchSumParallelAsync() {
 }
 
 /**
- * 求和（async 并行惰性启动（延迟启动并发））。
+ * 启动求和（async 并行惰性启动（延迟启动并发））。
  *
  * @param
  * @return
@@ -159,7 +164,7 @@ private fun launchSumParallelAsyncStartLazy() {
 }
 
 /**
- * 求和（async 并行、惰性启动、结构化并发）。
+ * 启动求和（async 并行、惰性启动、结构化并发）。
  *
  * @param
  * @return
@@ -183,6 +188,41 @@ private fun launchSumParallelAsyncStartLazyConcurrent() {
     }
     println("launch end.")
 }
+
+/** ********** 耗时 ********** */
+
+/**
+ * 启动耗时操作（async 并行惰性启动（延迟启动并发））。
+ *
+ * @param
+ * @return
+ */
+private fun launchTimeConsumingParallelAsyncStartLazy() {
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchTimeConsumingParallelAsyncStartLazy CoroutineScope().launch{} 外部")
+    println("launch start.")
+    CoroutineScope(Dispatchers.Default).launch {
+        printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchTimeConsumingParallelAsyncStartLazy CoroutineScope().launch{} 内部")
+        printlnPrePost("TimeConsuming start.")
+        val startTime: Long = currentTimeMillis()
+
+        val actTimeConsuming1000: Deferred<Unit> = async(start = CoroutineStart.LAZY) { actTimeConsuming1000() }
+        val actTimeConsuming5000: Deferred<Unit> = async(start = CoroutineStart.LAZY) { actTimeConsuming5000() }
+
+        actTimeConsuming1000.start()
+        actTimeConsuming5000.start()
+
+        val endTime: Long = currentTimeMillis()
+        println("总耗时：${endTime - startTime} ms", "launchTimeConsumingParallelAsyncStartLazy")
+
+        printlnPrePost("TimeConsuming end.")
+    }
+    println("launch end.")
+}
+
+
+/** ******************** 结构化并发 ******************** */
+
+/** ********** 求和 ********** */
 
 /**
  * 使用 coroutineScope{} 实现结构化并发。
@@ -221,6 +261,11 @@ private suspend fun concurrentSumWithContext(): Double = withContext(Dispatchers
 
     sum1 + sum2 + sum3
 }
+
+
+/** ******************** 耗时操作 ******************** */
+
+/** ********** 求和 ********** */
 
 /**
  * 使用 coroutineScope{} 实现求和计算。
@@ -321,23 +366,44 @@ private suspend fun sumWithContextDefaultByPollingByCancel(): Double = withConte
     sum
 }
 
-/**
- * 使用 withContext(CoroutineContext){} 实现求和计算。
- *
- * @param
- * @return
- */
-private suspend fun sumWithContextIO(): Double = withContext(Dispatchers.IO) {
-    printlnWithTime("CurrentThread sum: ${Thread.currentThread()}", "withContextIO")
-    val startTime: Long = currentTimeMillis()
+/** ********** 耗时 ********** */
 
-    var sum: Double = 0.0
-    for (i in 1 until 2000000001) {
-        sum += i
+private suspend fun actTimeConsuming1000() {
+    val result: Long = timeConsuming1000()
+    printlnWithTime("result = $result", "actTimeConsuming1000")
+    actTimeConsuming1000()
+}
+
+private suspend fun actTimeConsuming1000ByWithContext() {
+    withContext(Dispatchers.Default) {
+        val result: Long = timeConsuming1000()
+        printlnWithTime("result = $result", "actTimeConsuming1000ByWithContext")
+        actTimeConsuming1000ByWithContext()
     }
+}
 
-    val endTime: Long = currentTimeMillis()
-    printlnWithTime("sum = $sum", "withContextIO")
-    printlnPost("耗时：${endTime - startTime} ms", "withContextIO")
-    sum
+private suspend fun timeConsuming1000(): Long = withContext(Dispatchers.Default) {
+    val intervalMillis: Long = 1000
+    delay(intervalMillis)
+    intervalMillis
+}
+
+private suspend fun actTimeConsuming5000() {
+    val result: Long = timeConsuming5000()
+    printlnWithTime("result = $result", "actTimeConsuming5000")
+    actTimeConsuming5000()
+}
+
+private suspend fun actTimeConsuming5000ByWithContext() {
+    withContext(Dispatchers.Default) {
+        val result: Long = timeConsuming5000()
+        printlnWithTime("result = $result", "actTimeConsuming5000ByWithContext")
+        actTimeConsuming5000ByWithContext()
+    }
+}
+
+private suspend fun timeConsuming5000(): Long = withContext(Dispatchers.Default) {
+    val intervalMillis: Long = 5000
+    delay(intervalMillis)
+    intervalMillis
 }

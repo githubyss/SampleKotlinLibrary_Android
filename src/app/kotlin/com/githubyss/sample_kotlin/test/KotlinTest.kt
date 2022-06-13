@@ -1,6 +1,6 @@
 package com.githubyss.sample_kotlin.test
 
-import com.githubyss.sample_kotlin.test.coroutine.coroutineCallback
+import com.githubyss.sample_kotlin.test.coroutine.coroutineAsync
 
 
 fun main(args: Array<String>) {
@@ -15,8 +15,8 @@ fun main(args: Array<String>) {
 
     // timeDelay()
     // coroutine()
-    // coroutineAsync()
-    coroutineCallback()
+    coroutineAsync()
+    // coroutineCallback()
 
     // TestSynchronized.synchronize()
 }

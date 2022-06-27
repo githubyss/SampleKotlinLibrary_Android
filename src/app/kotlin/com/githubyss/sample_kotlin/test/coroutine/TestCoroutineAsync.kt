@@ -205,11 +205,7 @@ private fun launchTimeConsumingParallelAsyncStartLazy() {
         printlnPrePost("TimeConsuming start.")
         val startTime: Long = currentTimeMillis()
 
-        val actTimeConsuming1000: Deferred<Unit> = async(start = CoroutineStart.LAZY) { actTimeConsuming1000() }
-        val actTimeConsuming5000: Deferred<Unit> = async(start = CoroutineStart.LAZY) { actTimeConsuming5000() }
-
-        actTimeConsuming1000.start()
-        actTimeConsuming5000.start()
+        concurrentTimeConsumingWithContext()
 
         val endTime: Long = currentTimeMillis()
         println("总耗时：${endTime - startTime} ms", "launchTimeConsumingParallelAsyncStartLazy")
@@ -374,12 +370,10 @@ private suspend fun actTimeConsuming1000() {
     actTimeConsuming1000()
 }
 
-private suspend fun actTimeConsuming1000ByWithContext() {
-    withContext(Dispatchers.Default) {
-        val result: Long = timeConsuming1000()
-        printlnWithTime("result = $result", "actTimeConsuming1000ByWithContext")
-        actTimeConsuming1000ByWithContext()
-    }
+private fun actTimeConsuming1000Async(): Deferred<Unit> = GlobalScope.async {
+    val result: Long = timeConsuming1000()
+    printlnWithTime("result = $result", "actTimeConsuming1000Async")
+    actTimeConsuming1000Async()
 }
 
 private suspend fun timeConsuming1000(): Long = withContext(Dispatchers.Default) {
@@ -394,16 +388,24 @@ private suspend fun actTimeConsuming5000() {
     actTimeConsuming5000()
 }
 
-private suspend fun actTimeConsuming5000ByWithContext() {
-    withContext(Dispatchers.Default) {
-        val result: Long = timeConsuming5000()
-        printlnWithTime("result = $result", "actTimeConsuming5000ByWithContext")
-        actTimeConsuming5000ByWithContext()
-    }
+private fun actTimeConsuming5000Async(): Deferred<Unit> = GlobalScope.async {
+    val result: Long = timeConsuming5000()
+    printlnWithTime("result = $result", "actTimeConsuming5000Async")
+    actTimeConsuming5000Async()
 }
 
 private suspend fun timeConsuming5000(): Long = withContext(Dispatchers.Default) {
     val intervalMillis: Long = 5000
     delay(intervalMillis)
     intervalMillis
+}
+
+private suspend fun concurrentTimeConsumingWithContext() = withContext(Dispatchers.Default) {
+    // val actTimeConsuming1000: Deferred<Unit> = async(start = CoroutineStart.LAZY) { actTimeConsuming1000() }
+    // val actTimeConsuming5000: Deferred<Unit> = async(start = CoroutineStart.LAZY) { actTimeConsuming5000() }
+    val actTimeConsuming1000: Deferred<Unit> = actTimeConsuming1000Async()
+    val actTimeConsuming5000: Deferred<Unit> = actTimeConsuming5000Async()
+
+    actTimeConsuming1000.start()
+    actTimeConsuming5000.start()
 }

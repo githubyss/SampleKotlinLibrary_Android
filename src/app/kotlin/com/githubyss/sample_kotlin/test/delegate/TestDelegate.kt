@@ -29,19 +29,19 @@ class ByLazy : BaseView<Presenter> {
 
 class ByDelegate {
     // var token: String
-    //     set(value) {
-    //         CacheUtils.save("token", value)
-    //     }
     //     get() {
     //         return CacheUtils.get("token")
     //     }
+    //     set(value) {
+    //         CacheUtils.save("token", value)
+    //     }
     //
     // var token2: String
-    //     set(value) {
-    //         CacheUtils.save("token2", value)
-    //     }
     //     get() {
     //         return CacheUtils.get("token2")
+    //     }
+    //     set(value) {
+    //         CacheUtils.save("token2", value)
     //     }
 
     // 传入 key 给 Saver 委托，通过委托类进行数据的缓存存储和提取
@@ -50,14 +50,14 @@ class ByDelegate {
 
     // 通过委托实现数据的处理
     class Saver(var token: String) {
-        operator fun setValue(byDelegate: ByDelegate, property: KProperty<*>, value: String) {
-            // 存入缓存
-            CacheUtils.save(token, value)
-        }
-
         operator fun getValue(byDelegate: ByDelegate, property: KProperty<*>): String {
             // 从缓存中获取
             return CacheUtils.get(token)
+        }
+
+        operator fun setValue(byDelegate: ByDelegate, property: KProperty<*>, value: String) {
+            // 存入缓存
+            CacheUtils.save(token, value)
         }
     }
 }

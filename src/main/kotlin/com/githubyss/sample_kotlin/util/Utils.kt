@@ -1,6 +1,6 @@
 package com.githubyss.sample_kotlin.util
 
-import com.githubyss.mobile.common.kit.util.currentDatetimeYmdH24msMillisFullDividedByEnDash
+import com.githubyss.mobile.common.kit.util.currentDatetimeStringYmdH24msMillisFullDividedByEnDash
 
 
 fun print(msg: String) {
@@ -40,7 +40,7 @@ fun printlnWithTime(msg: String, suffix: String = "") {
         suffix.isEmpty() -> ""
         else -> " >> $suffix"
     }
-    kotlin.io.println("$msg | CurrentTime: ${currentDatetimeYmdH24msMillisFullDividedByEnDash()}$suffix")
+    kotlin.io.println("$msg | CurrentTime: ${currentDatetimeStringYmdH24msMillisFullDividedByEnDash}$suffix")
 }
 
 fun printlnPreWithTime(msg: String, suffix: String = "") {

@@ -26,5 +26,10 @@ private fun forIn() {
     for (i in 0 until 100) {
         println(i)
     }
+
+    val array = arrayOf(1, 2, 3, 4, 5)
+    for ((idx, item) in array.withIndex()) {
+
+    }
     println()
 }

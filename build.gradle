@@ -55,7 +55,7 @@ android {
                 applicationId 'com.githubyss.sample_kotlin'
                 versionCode 1
                 versionName "1.0"
-                manifestPlaceholders = [APP_NAME: "Kotlin 模板库"]
+                manifestPlaceholders = [APP_NAME: "Kotlin 模板"]
             }
         }
     }

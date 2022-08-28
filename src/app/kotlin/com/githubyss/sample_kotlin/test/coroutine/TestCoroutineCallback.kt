@@ -1,6 +1,6 @@
 package com.githubyss.sample_kotlin.test.coroutine
 
-import com.githubyss.mobile.common.kit.util.currentTimeMillis
+import com.githubyss.mobile.common.kit.util.currentDatetimeMillis
 import com.githubyss.sample_kotlin.util.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.resume
@@ -43,7 +43,7 @@ private fun launchCheck() {
     CoroutineScope(Dispatchers.Default).launch {
         printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchCheck CoroutineScope().launch{} 内部")
         println("Check start.")
-        val startTime: Long = currentTimeMillis()
+        val startTime: Long = currentDatetimeMillis
 
         // 直接使用挂起函数，默认串行执行
         val result1: Boolean = checkSuspendCoroutine()
@@ -51,7 +51,7 @@ private fun launchCheck() {
         val result3: Boolean = checkSuspendCoroutineByPolling()
         val resultFinal = result1 && result2 && result3
 
-        val endTime: Long = currentTimeMillis()
+        val endTime: Long = currentDatetimeMillis
         printlnWithTime("resultFinal = $resultFinal", "launchCheck")
         println("总耗时：${endTime - startTime} ms", "launchCheck")
 
@@ -72,11 +72,11 @@ private fun launchCheckParallelAsyncStartLazyConcurrent() {
     CoroutineScope(Dispatchers.Default).launch {
         printlnWithTime("CurrentThread: ${Thread.currentThread()}", "launchCheckParallelAsyncStartLazyConcurrent CoroutineScope().launch{} 内部")
         printlnPrePost("Check start.")
-        val startTime: Long = currentTimeMillis()
+        val startTime: Long = currentDatetimeMillis
 
         val resultFinal = concurrentCheckWithContext()
 
-        val endTime: Long = currentTimeMillis()
+        val endTime: Long = currentDatetimeMillis
         printlnWithTime("resultFinal = $resultFinal", "launchCheckParallelAsyncStartLazyConcurrent")
         println("总耗时：${endTime - startTime} ms", "launchCheckParallelAsyncStartLazyConcurrent")
 
@@ -110,7 +110,7 @@ private suspend fun concurrentCheckWithContext(): Boolean = withContext(Dispatch
  */
 private suspend fun checkSuspendCoroutine(): Boolean = suspendCoroutine {
     printlnWithTime("CurrentThread check: ${Thread.currentThread()}", "suspendCoroutine")
-    val startTime: Long = currentTimeMillis()
+    val startTime: Long = currentDatetimeMillis
 
     var result: Boolean = false
     for (i in 0 until 2000000001) {
@@ -120,7 +120,7 @@ private suspend fun checkSuspendCoroutine(): Boolean = suspendCoroutine {
         }
     }
 
-    val endTime: Long = currentTimeMillis()
+    val endTime: Long = currentDatetimeMillis
     printlnWithTime("result = $result", "suspendCoroutine")
     printlnPost("耗时：${endTime - startTime} ms", "suspendCoroutine")
 }
@@ -133,7 +133,7 @@ private suspend fun checkSuspendCoroutine(): Boolean = suspendCoroutine {
  */
 private suspend fun checkSuspendCoroutineByPolling(): Boolean = suspendCoroutine { continuation ->
     printlnWithTime("CurrentThread check: ${Thread.currentThread()}", "suspendCoroutineByPolling")
-    val startTime: Long = currentTimeMillis()
+    val startTime: Long = currentDatetimeMillis
 
     var isActive: Boolean = true
     var i: Long = 0
@@ -147,7 +147,7 @@ private suspend fun checkSuspendCoroutineByPolling(): Boolean = suspendCoroutine
         i++
     }
 
-    val endTime: Long = currentTimeMillis()
+    val endTime: Long = currentDatetimeMillis
     printlnWithTime("result = $result", "suspendCoroutineByPolling")
     printlnPost("耗时：${endTime - startTime} ms", "suspendCoroutineByPolling")
 }

@@ -1,6 +1,6 @@
 package com.githubyss.sample_kotlin.test
 
-import com.githubyss.sample_kotlin.test.circulation.circulation
+import com.githubyss.sample_kotlin.test.higher_order_function.highOrder
 
 
 /**
@@ -26,9 +26,9 @@ fun main(args: Array<String>) {
     // nest()
     // infix()
     // component()
-    // highOrder()
+    highOrder()
     // delegate()
-    circulation()
+    // circulation()
 
     // list()
 

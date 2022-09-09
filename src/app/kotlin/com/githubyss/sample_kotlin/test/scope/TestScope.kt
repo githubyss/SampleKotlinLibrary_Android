@@ -50,7 +50,7 @@ fun let() {
         it.style = Paint.Style.STROKE
         it.color = Color.BLUE
         it.strokeWidth = 6f.dp2px
-        return@let it
+        it
     }
 
     val message: String? = null

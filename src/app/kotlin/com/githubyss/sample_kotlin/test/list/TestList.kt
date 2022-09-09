@@ -8,12 +8,70 @@ fun list() {
     println("列表操作")
     println()
 
-    println("源数据：")
-    println("$list")
-    println()
-
+    printInfo()
+    dotdot()
+    listBasic()
+    listSwitch()
+    listUpdate()
     listTotal()
     listFilter()
+
+    println()
+}
+
+private fun printInfo() {
+    println("源数据")
+    println("list: $list")
+    println("list.toString(): ${list.toString()}")
+    println("list.joinToString(): ${list.joinToString()}")
+    println()
+}
+
+private fun dotdot() {
+    println("点点范围表达式")
+
+    println("0..5: ${0..5}")
+    println("\"a\"..\"z\": ${"a".."z"}")
+    println("2 in 0..5: ${2 in 0..5}")
+    println("\"c\" in \"a\"..\"z\": ${"c" in "a".."z"}")
+
+    println("(0..5).first: ${(0..5).first}")
+    println("(0..5).last: ${(0..5).last}")
+    println("(0..5).step: ${(0..5).step}")
+    println("(0..5).random(): ${(0..5).random()}")
+    println("(0..5).joinToString(): ${(0..5).joinToString()}")
+
+    println()
+}
+
+private fun listBasic() {
+    println("基础遍历，防止崩溃")
+
+    println(list.getOrElse(100) { "越界" })
+    println(list.getOrNull(100) ?: "your out of bound")
+    println(list.getOrNull(100))
+
+    println()
+}
+
+private fun listSwitch() {
+    println("不可变集合与可变集合互相转换")
+
+    list.toMutableList().add(100)
+    mutableList.toList()
+
+    println()
+}
+
+private fun listUpdate() {
+    println("内容操作")
+
+    mutableList.add(100)
+    mutableList.remove(100)
+    // mutableList.removeIf { it < 6 }
+
+    mutableList += 100
+    mutableList -= 100
 
     println()
 }

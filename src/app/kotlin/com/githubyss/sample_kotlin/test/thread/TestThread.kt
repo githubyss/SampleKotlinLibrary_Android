@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
  * @createdTime 2022/04/26 18:50:51
  */
 fun thread() {
-    println("调测多线程")
+    println("多线程")
     println()
 
     threadNormal()

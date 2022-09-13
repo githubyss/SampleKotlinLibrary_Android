@@ -22,13 +22,16 @@ import kotlin.concurrent.timerTask
 private var delayInMillis: Long = 2000
 
 fun timeDelay() {
-    printlnWithTime("调测延迟：CurrentThread: ${Thread.currentThread()}")
+    println("调测延迟")
+    printlnWithTime("CurrentThread: ${Thread.currentThread()}")
     println()
 
     delayCoroutine()
-    delayThread()
-    delayTimerTask()
+    // delayThread()
+    // delayTimerTask()
     // delayHandler()
+
+    println()
 }
 
 private fun delayCoroutine() {
@@ -75,21 +78,20 @@ private fun delayThread() {
     println()
 }
 
-private fun delayTimerTask() {
-    val timer: Timer = Timer()
-    printlnWithTime("object:TimerTask(){} >> schedule start! \t CurrentThread: ${Thread.currentThread()}")
-    timer.schedule(object : TimerTask() {
-        override fun run() {
-            printlnWithTime("object:TimerTask(){} >> schedule finish! \t CurrentThread: ${Thread.currentThread()}")
-            System.gc()
-        }
-    }, delayInMillis)
-
-    printlnWithTime("timerTask{} >> schedule start! \t\t\t\t CurrentThread: ${Thread.currentThread()}")
-    timer.schedule(timerTask {
-        printlnWithTime("timerTask{} >> schedule finish! \t\t\t CurrentThread: ${Thread.currentThread()}")
+private val timerTask
+    get() = timerTask {
+        printlnWithTime("Run task! \t\t\t CurrentThread: ${Thread.currentThread()}")
         System.gc()
-    }, delayInMillis)
+    }
+
+private fun delayTimerTask() {
+    val timer = Timer()
+
+    printlnWithTime("Schedule start 1! \t CurrentThread: ${Thread.currentThread()}")
+    timer.schedule(timerTask, delayInMillis)
+
+    printlnWithTime("Schedule start 2! \t CurrentThread: ${Thread.currentThread()}")
+    timer.schedule(timerTask, delayInMillis)
 
     println()
 }

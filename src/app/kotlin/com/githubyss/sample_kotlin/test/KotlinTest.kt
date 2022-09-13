@@ -1,6 +1,8 @@
 package com.githubyss.sample_kotlin.test
 
 import com.githubyss.sample_kotlin.test.higher_order_function.highOrder
+import com.githubyss.sample_kotlin.test.time_delay.timeDelay
+import com.githubyss.sample_kotlin.test.timer.timer
 
 
 /**
@@ -18,7 +20,11 @@ fun main(args: Array<String>) {
     // TestThread.thread()
     // thread()
 
+    timer()
+
     // timeDelay()
+    // timePeriod()
+
     // coroutine()
     // coroutineAsync()
     // coroutineCallback()
@@ -26,7 +32,7 @@ fun main(args: Array<String>) {
     // nest()
     // infix()
     // component()
-    highOrder()
+    // highOrder()
     // delegate()
     // circulation()
 

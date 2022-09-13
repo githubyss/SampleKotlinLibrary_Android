@@ -1,6 +1,9 @@
 package com.githubyss.sample_kotlin.util
 
+import com.githubyss.mobile.common.kit.util.currentDatetimeStringUtc
 import com.githubyss.mobile.common.kit.util.currentDatetimeStringYmdH24msMillisFullDividedByEnDash
+import com.githubyss.mobile.common.kit.util.currentTimeStringH24msFullDividedByChs
+import com.githubyss.mobile.common.kit.util.currentTimeStringH24msmFullDividedByChs
 
 
 fun print(msg: String) {
@@ -36,11 +39,11 @@ fun printlnPrePost(msg: String, suffix: String = "") {
 }
 
 fun printlnWithTime(msg: String, suffix: String = "") {
-    val suffix: String = when {
+    val suffix = when {
         suffix.isEmpty() -> ""
         else -> " >> $suffix"
     }
-    kotlin.io.println("$msg | CurrentTime: ${currentDatetimeStringYmdH24msMillisFullDividedByEnDash}$suffix")
+    println("$msg | CurrentTime: ${currentTimeStringH24msmFullDividedByChs}$suffix")
 }
 
 fun printlnPreWithTime(msg: String, suffix: String = "") {

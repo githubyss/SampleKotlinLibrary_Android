@@ -1,9 +1,6 @@
 package com.githubyss.sample_kotlin.util
 
-import com.githubyss.mobile.common.kit.util.currentDatetimeStringUtc
-import com.githubyss.mobile.common.kit.util.currentDatetimeStringYmdH24msMillisFullDividedByEnDash
-import com.githubyss.mobile.common.kit.util.currentTimeStringH24msFullDividedByChs
-import com.githubyss.mobile.common.kit.util.currentTimeStringH24msmFullDividedByChs
+import com.githubyss.common.kit.util.currentTimeStringH24msmFullDividedByChs
 
 
 fun print(msg: String) {

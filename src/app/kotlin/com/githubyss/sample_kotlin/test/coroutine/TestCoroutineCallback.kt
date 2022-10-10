@@ -1,6 +1,6 @@
 package com.githubyss.sample_kotlin.test.coroutine
 
-import com.githubyss.mobile.common.kit.util.currentDatetimeMillis
+import com.githubyss.common.kit.util.currentDatetimeMillis
 import com.githubyss.sample_kotlin.util.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.resume

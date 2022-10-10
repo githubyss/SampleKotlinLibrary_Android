@@ -2,7 +2,7 @@ package com.githubyss.sample_kotlin.test.scope
 
 import android.graphics.Color
 import android.graphics.Paint
-import com.githubyss.mobile.common.kit.util.dp2px
+import com.githubyss.common.kit.util.dp2px
 
 
 fun scope() {
